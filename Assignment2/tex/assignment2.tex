@@ -1,0 +1,39 @@
+\documentclass[english]{exercisesheet}
+
+\usepackage{bm}
+\usepackage{mymath}
+
+\author{Lorenzo Minecci, Daniel Strenger}
+\immatriculationnumber{11939539, 01531211}
+\semester{SS 2020}
+\subject{Machine Learning}
+\sheetnumber{2}
+
+\begin{document}
+ \makedocumentheader
+ 
+ \begin{nexercise}{Logistic Regression}
+\end{nexercise}
+
+\begin{solution}
+ 1. We have $p(t=1|\bm{\tilde{x}})=\sigma(\bm{\tilde{w}}^t\bm{\tilde{x}})=\sigma(1\cdot\bm{w}^t\bm{\tilde{x}})$ and
+
+ \begin{align*}
+ p(t=-1|\bm{\tilde{x}})=1-\sigma(\bm{\tilde{w}}^t\bm{\tilde{x}})=1-\frac{1}{1+e^{-\bm{\tilde{w}}^t\bm{\tilde{x}}}}=\frac{1+e^{-\bm{\tilde{w}}^t\bm{\tilde{x}}}}{1+e^{-\bm{\tilde{w}}^t\bm{\tilde{x}}}}-\frac{1}{1+e^{-\bm{\tilde{w}}^t\bm{\tilde{x}}}}\\=\frac{e^{-\bm{\tilde{w}}^t\bm{\tilde{x}}}}{1+e^{-\bm{\tilde{w}}^t\bm{\tilde{x}}}}=\frac{1}{e^{\bm{\tilde{w}}^t\bm{\tilde{x}}}+1}=\sigma(-\bm{\tilde{w}}^t\bm{\tilde{x}})
+\end{align*}\\
+\par 2.
+\begin{align*}
+ -\log (p(\bm{\tilde{w}}|\bm{t},\bm{x}))=-\log(p(\bm{w}))-\sum_{n=1}^N \log(\sigma(t_n\bm{\tilde{w}^t\tilde{x}_n}))=\\-\log(p(\bm{w}))-\sum_{n=1}^N \log(\frac{1}{1+e^{-t_n\bm{\tilde{w}^t\tilde{x}_n}}})\\
+ =-\log(p(\bm{w}))+\sum_{n=1}^N \log(1+e^{-t_n\bm{\tilde{w}^t\tilde{x}_n}})=\\-\log\left(\frac{1}{(2\pi S^{2N})^{N/2}}\exp\left(-\frac{1}{2S^{2N}}\sum_{n=1}^N S^2w_n^2\right)\right)+\sum_{n=1}^N \log(1+e^{-t_n\bm{\tilde{w}^t\tilde{x}_n}})\\
+ =-\log\left(\frac{1}{(2\pi S^{2N})^{N/2}}\right)+\frac{1}{2S^{2N}}\sum_{n=1}^N S^2w_n^2+\sum_{n=1}^N \log(1+e^{-t_n\bm{\tilde{w}^t\tilde{x}_n}})
+\end{align*}\\
+\par 3.
+\begin{align*}
+ \frac{\partial}{\partial b}E(\bm{\tilde{w}})=\sum_{n=1}^N\frac{\partial}{\partial b} \log(1+e^{-t_n\bm{\tilde{w}^t\tilde{x}_n}})=\sum_{n=1}^N\frac{-t_ne^{-t_n\bm{\tilde{w}^t\tilde{x}_n}}}{1+e^{-t_n\bm{\tilde{w}^t\tilde{x}_n}}},\\
+ \frac{\partial}{\partial w_i}E(\bm{\tilde{w}})=\frac{1}{2S^{2N}}\sum_{n=1}^N  \frac{\partial}{\partial w_i} S^2w_n^2+\sum_{n=1}^N\frac{\partial}{\partial w_i} \log(1+e^{-t_n\bm{\tilde{w}^t\tilde{x}_n}})\\=\frac{w_i}{S^{2(N-1)}}+\sum_{n=1}^N\frac{-t_n\tilde{x}_n^ie^{-t_n\bm{\tilde{w}^t\tilde{x}_n}}}{1+e^{-t_n\bm{\tilde{w}^t\tilde{x}_n}}}
+\end{align*}
+
+\end{solution}
+
+ 
+\end{document}
