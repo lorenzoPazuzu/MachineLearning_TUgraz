@@ -35,10 +35,8 @@ def grad(w,X,t,S):
     '''
    g=np.ndarray(len(w))
    wt=np.transpose(w)
+   g[1:]=w[1:]/S+np.sum(-X[1:]*t*np.exp(-t*np.dot(wt,X))/(1+np.exp(-t*np.dot(wt,X))),axis=1)
    g[0]=np.sum(np.exp(-t*np.dot(wt,X))*-t/(1+np.exp(-t*np.dot(wt,X))))
-   for i in range(1,len(w)):
-        g[i]=w[i]/S**(len(w)-1)+np.sum(-X[i]*t*np.exp(-t*np.dot(wt,X))/(1+np.exp(-t*np.dot(wt,X))))
-   return g
 
 def nagm(K,X,t,S):
     '''
@@ -100,10 +98,9 @@ def E(w,X,t,S):
         energy
 
     '''
-    ret=multivariate_normal.pdf(w,cov=np.diag([S]*len(w)))
+    ret=multivariate_normal.pdf(w[1:],mean=np.zeros(len(w)-1),cov=np.diag([S]*(len(w)-1)))
     ret=-np.log(ret)
-    for i in range(len(X[0])):
-        ret+=np.log(1+np.exp((t[i]*np.dot(np.transpose(w),X[:,i]))))
+    ret+=np.sum(np.log(1+np.exp((-t*np.dot(np.transpose(w),X)))))
     return ret
 
 def sigmoid(x):
@@ -122,7 +119,9 @@ X=np.concatenate((np.ones((1,len(X[0]))),X))
 #generate the labels
 t=np.concatenate((np.ones(500),-1*np.ones(500)))
 
-
+plt.scatter(data1[:,0],data1[:,1],edgecolors='blue',label='$\mu_1=(6.5,2); \Sigma_1$')
+plt.scatter(data2[:,0],data2[:,1],edgecolors='red',label='$\mu_2=(0.5,2); \Sigma_2$')
+plt.show()
 
 #compute optimal weight vector
 S_list=[0.1, 0.3,0.5,1,10,100,1000]
