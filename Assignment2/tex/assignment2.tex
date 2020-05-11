@@ -19,7 +19,7 @@
   p(t|\bm{x}, \bm{w}) = \prod_{n=1}^N \sqrt{\frac{\beta}{2\pi}}\exp{(-\beta \frac{( \bm{t}-\bm{w}^{T} \bm{\phi}(x_n))^{2}}{2})}
   \end{align*}
   \begin{align*}
-      \log(p(\bm{t}|\bm{x}, \bm{w})) = \sum_{n=1}^N \frac{1}{2}(\ln{\beta}-\ln{2\pi}) + [-\frac{\beta}{2}(\bm{t}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}] = \frac{N}{2}(\ln\beta-\ln2\pi)-\beta\underbrace{\frac{1}{2}\sum_{n=1}^N(\bm{t}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}}_\text{Ed}= 
+      \log(p(\bm{t}|\bm{x}, \bm{w})) = \sum_{n=1}^N \frac{1}{2}(\ln{\beta}-\ln{2\pi}) + [-\frac{\beta}{2}(\bm{t}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}] = \frac{N}{2}(\ln\beta-\ln2\pi)-\beta\underbrace{\frac{1}{2}\sum_{n=1}^N(\bm{t}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}}_{E_D}= 
   \end{align*}
   \begin{align*} \frac{N}{2}(\ln\beta-\ln2\pi)-\beta E_{D}
   \end{align*}
@@ -29,7 +29,7 @@
   \begin{solution} 2.
   \\ It's a multivariate Gaussian, and again we are going to compute the logarithm. So:
   \begin{align*}
-  \ln(p(\bm{w})) = \ln(\mathcal{N}(\bm {w} | \bm {0}, \alpha^{-1}I)) =  \frac{1}{(2\pi)^{\frac{D}{2}}\alpha^{-1}I}\exp\left((-\frac{1}{2}\bm{w}^{T}(\alpha^{-1}I)\bm{w})\right) = \\ -\frac{D}{2}\ln(2\pi)-\frac{1}{2}\ln(|\alpha^{-1}I|)-\left(\frac{1}{2}\bm{w}^{T}(\alpha^{-1}I)^{-1}\bm{w}\right) = 
+  \ln(p(\bm{w})) = \ln(\mathcal{N}(\bm {w} | \bm {0}, \alpha^{-1}I)) =  \ln\left(\frac{1}{(2\pi)^{\frac{M+1}{2}}|\alpha^{-1}I|}\exp\left((-\frac{1}{2}\bm{w}^{T}(\alpha^{-1}I)\bm{w})\right) \right)= \\ -\frac{M+1}{2}\ln(2\pi)-\frac{1}{2}\ln(|\alpha^{-1}I|)-\left(\frac{1}{2}\bm{w}^{T}(\alpha^{-1}I)\bm{w}\right) = \\ -\frac{M+1}{2}\ln(2\pi)+\frac{M+1}{2}\ln(\alpha)-\frac{1}{2}\sum_{i=1}^{M+1} \frac{w_i}{\alpha}
   \end{align*}
   In this setting we notice that only the third term is dependent on $w$, while the first two terms as constants. We'll use this consideration for the next exercise.
     \end{solution}\\
