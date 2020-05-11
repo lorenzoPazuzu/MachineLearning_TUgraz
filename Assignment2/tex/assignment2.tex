@@ -10,8 +10,59 @@
 \subject{Machine Learning}
 \sheetnumber{2}
 
-\begin{document}
+ \begin{document}
  \makedocumentheader
+  \begin{nexercise}{Online Bayesian Linear Regression}
+  \begin{solution} 1.
+  
+  \begin{align*}
+  p(t|\bm{x}, \bm{w}) = \prod_{n=1}^N \sqrt{\frac{\beta}{2\pi}}\exp{(-\beta \frac{( \bm{t}-\bm{w}^{T} \bm{\phi}(x_n))^{2}}{2})}
+  \end{align*}
+  \begin{align*}
+      \log(p(\bm{t}|\bm{x}, \bm{w})) = \sum_{n=1}^N \frac{1}{2}(\ln{\beta}-\ln{2\pi}) + [-\frac{\beta}{2}(\bm{t}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}] = \frac{N}{2}(\ln\beta-\ln2\pi)-\beta\underbrace{\frac{1}{2}\sum_{n=1}^N(\bm{t}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}}_\text{Ed}= 
+  \end{align*}
+  \begin{align*} \frac{N}{2}(\ln\beta-\ln2\pi)-\beta E_{D}
+  \end{align*}
+  \end{solution}
+  
+  \par 
+  \begin{solution} 2.
+  \\ It's a multivariate Gaussian, and again we are going to compute the logarithm. So:
+  \begin{align*}
+  \ln(p(\bm{w})) = \ln(\mathcal{N}(\bm {w} | \bm {0}, \alpha^{-1}I)) =  \frac{1}{(2\pi)^{\frac{D}{2}}\alpha^{-1}I}\exp\left((-\frac{1}{2}\bm{w}^{T}(\alpha^{-1}I)\bm{w})\right) = \\ -\frac{D}{2}\ln(2\pi)-\frac{1}{2}\ln(|\alpha^{-1}I|)-\left(\frac{1}{2}\bm{w}^{T}(\alpha^{-1}I)^{-1}\bm{w}\right) = 
+  \end{align*}
+  In this setting we notice that only the third term is dependent on $w$, while the first two terms as constants. We'll use this consideration for the next exercise.
+    \end{solution}\\
+    \begin{solution} 3.
+  \par 
+  Bayes theorem states that:
+  \begin{align*}
+  p(\bm{w}|\bm{t}) = \frac{p(\bm{t}|\bm{w})p(\bm{w})}{p(\bm{t})}
+  \end{align*}
+  We assume that $p(\bm t)$ is not depending on $w$, so also its logarithm will be independent. \\ Let's compute the logarithm of the posterior simply as:
+  \begin{align*}
+      \ln(p(\bm{t}|\bm{w}))+ \ln(p(\bm{w})) + cost = \underbrace{\frac{N}{2}\left(\ln\beta-\ln(2\pi)\right)}_\text{cost} - \frac{\beta}{2}\sum_{n=1}^{N}(\bm{t}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2} + \\ + \left[\underbrace{-\frac{D}{2}\ln(2\pi)-\frac{D}{2}\ln(\alpha)}_\text{cost}+\left(-\frac{1}{2}\bm{w}^{T}(\alpha^{-1}I)^{-1}\bm{w}\right)\right] = \\
+      \end{align*}
+      concluding:
+     \begin{align*}
+      \ln(p(\bm{w}|\bm{t})) = -\frac{\beta}{2}\sum_{n=1}^{N}(\bm{t}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}-\frac{\alpha}{2}\bm{w}^{T}\bm{w} + cost
+    \end{align*}
+    where we grouped in $cost$ all the terms constant with respect to $w$. The alpha becomes a scalar multiplying the vector product.
+    The maximization of this distribution w.r.t. $\bm{w}$ is equivalent to the minimization of the sum-of-squares approach with addition of a quadratic regularization term $\lambda = \frac{\alpha}{\beta}$. \\
+      \end{solution}
+      \par
+      \begin{solution} 4.\\
+      Let's now maximise the log-posterior w.r.t. $w$
+      We can express the vectors $\phi(x_{i})$ as rows of the design matrix $\Phi$
+      \begin{align*}
+          \frac{\partial}{\partial w_{i}}\left[\frac{\beta}{2}\sum_{n=1}^{N}(\bm{t}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}-\frac{\alpha}{2}\bm{w}^{T}\bm{w}+cost \right] = \frac{\beta}{2}(2\Phi_{i}^{T}\Phi \bm{w} - 2\Phi_{i}^{T}\bm{t}) + \frac{\alpha}{2}2\bm{w} = \\ = \left(\beta\Phi^{T}\Phi+\alpha I\right)\bm{w}-\beta\Phi_{i}^{T}\bm{t} \stackrel{!}{=} 0 \\
+      \end{align*}
+      \begin{align*}
+          \Rightarrow \bm{w}_{map} = (\Phi^{T}\Phi + \frac{\alpha}{\beta}I)^{-1}\Phi \bm{t} \\
+      \end{align*}
+      That we can see it's equal to $\bm{m} = \beta\bm{S\Phi^{T}t}$, being $\bm{S}=\left(\alpha \bm{I} +\beta \bm{\Phi^{T}\Phi}\right)^{-1}$.\\ We took $\beta$ out of $\bm{S}$, which is finally a scalar multiplier in $\bm{m}$ .\\
+      \end{solution}
+ \end{nexercise}
  
  \begin{nexercise}{Logistic Regression}
 \end{nexercise}
