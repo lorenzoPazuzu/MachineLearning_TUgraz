@@ -37,6 +37,7 @@ def grad(w,X,t,S):
    wt=np.transpose(w)
    g[1:]=w[1:]/S+np.sum(-X[1:]*t*np.exp(-t*np.dot(wt,X))/(1+np.exp(-t*np.dot(wt,X))),axis=1)
    g[0]=np.sum(np.exp(-t*np.dot(wt,X))*-t/(1+np.exp(-t*np.dot(wt,X))))
+   return g
 
 def nagm(K,X,t,S):
     '''
@@ -108,7 +109,7 @@ def sigmoid(x):
 
 def p(x,w):
     xt=np.transpose(x)
-    return sigmoid(w[0]+np.dot(xt,w[1:]))
+    return np.transpose(sigmoid(w[0]+np.dot(xt,w[1:])))
 
 #generate the sample points
 data1=np.random.multivariate_normal([6.5,2], [[0.8, 0],[0,0.7]],500)
@@ -121,10 +122,11 @@ t=np.concatenate((np.ones(500),-1*np.ones(500)))
 
 plt.scatter(data1[:,0],data1[:,1],edgecolors='blue',label='$\mu_1=(6.5,2); \Sigma_1$')
 plt.scatter(data2[:,0],data2[:,1],edgecolors='red',label='$\mu_2=(0.5,2); \Sigma_2$')
+plt.savefig('tex/points.pdf')
 plt.show()
 
 #compute optimal weight vector
-S_list=[0.1, 0.3,0.5,1,10,100,1000]
+S_list=[10**k for k in range(-4,5)]
 for k in range(len(S_list)):
     S=S_list[k]
     #compare our results to the scipy's approximation
@@ -143,7 +145,8 @@ for k in range(len(S_list)):
     MG = np.meshgrid(xs,ys)
     
     ZS=p(MG,w_star)
-    plt.contourf(xs,ys,ZS,levels=np.linspace(0,1,20))
+    plt.contourf(xs,ys,np.transpose(ZS),levels=np.linspace(0,1,20))
+    plt.colorbar()
     
     plt.scatter(data1[:,0],data1[:,1],edgecolors='blue',label='$\mu_1=(6.5,2); \Sigma_1$')
     plt.scatter(data2[:,0],data2[:,1],edgecolors='red',label='$\mu_2=(0.5,2); \Sigma_2$')
@@ -160,17 +163,22 @@ spam_train=np.transpose(spam_train)
 labels=spam_train[-1]
 spam_train=spam_train[:-1]
 
+spam_val=np.load('spam_val.npy')
+spam_val=np.transpose(spam_val)
+
+val_labels=spam_val[-1]
+spam_val=spam_val[:-1]
+
 X=np.concatenate((np.ones((1,len(spam_train[0]))),spam_train))
+print('S^2\t\t training\t\t validation')
+print('_'*66)
 for k in range(len(S_list)):
     S=S_list[k]
     w_star=nagm(1000,X,labels,S)
     
-    spam_val=np.load('spam_val.npy')
-    spam_val=np.transpose(spam_val)
+    train_predictions=2*(p(spam_train,w_star)>=0.5)-1
+    A_train=1/len(spam_train[0])*sum(train_predictions==labels)#60%, 84%, 90%, 91% for S>=1e-1
     
-    val_labels=spam_val[-1]
-    spam_val=spam_val[:-1]
-    
-    predictions=2*(p(spam_val,w_star)>=0.5)-1
-    A=1/len(spam_val[0])*sum(predictions==val_labels)
-    print(A)#60% for S=0.1,0.3,0.5 ~91% for the other values. Accuracy slightly increases with S.
+    val_predictions=2*(p(spam_val,w_star)>=0.5)-1
+    A_val=1/len(spam_val[0])*sum(val_predictions==val_labels)#60%, 84%, 88%, 91% for S>=1e-1
+    print(str(S)+'\t\t'+ str(A_train)+'\t\t'+str(A_val))
