@@ -8,7 +8,6 @@ Created on Wed May  6 17:25:11 2020
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import approx_fprime
-from scipy.stats import multivariate_normal
 
 S=2**2
 
@@ -99,8 +98,7 @@ def E(w,X,t,S):
         energy
 
     '''
-    ret=multivariate_normal.pdf(w[1:],mean=np.zeros(len(w)-1),cov=np.diag([S]*(len(w)-1)))
-    ret=-np.log(ret)
+    ret=-np.log(1/(2*np.pi*S)**(len(w[1:])/2))+1/(2*S)*np.sum(w[1:]**2)
     ret+=np.sum(np.log(1+np.exp((-t*np.dot(np.transpose(w),X)))))
     return ret
 
