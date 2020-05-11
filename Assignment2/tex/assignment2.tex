@@ -4,7 +4,7 @@
 \usepackage{mymath}
 \usepackage{graphicx}
 
-\author{Lorenzo Minecci, Daniel Strenger}
+\author{Lorenzo Minneci, Daniel Strenger}
 \immatriculationnumber{11939539, 01531211}
 \semester{SS 2020}
 \subject{Machine Learning}
@@ -62,8 +62,53 @@
       \end{align*}
       That we can see it's equal to $\bm{m} = \beta\bm{S\Phi^{T}t}$, being $\bm{S}=\left(\alpha \bm{I} +\beta \bm{\Phi^{T}\Phi}\right)^{-1}$.\\ We took $\beta$ out of $\bm{S}$, which is finally a scalar multiplier in $\bm{m}$ .\\
       \end{solution}
+      \par
+      \begin{solution} 5, 6, 7, 8.\\
+            Here $K = 33$ was chosen.
+              We can see here that as we increase sigma the curve gets smoother while interpolating between the data points. On the other hand, if we decrease sigma (e.g. $\sigma_{r}^{2} = 0.1$) the curve present peaks, sometimes showing a discontinuity on the first derivative of the curve. This is because our function learns very particular “behaviour” from the data: each data points has a narrow effect on the prediction of the next value.
+            We can also notice how abruptly our prediction for $x > K$ flattens on the mean value.
+        \begin{figure}
+        \centering
+        \includegraphics[width=1\textwidth]{1.pdf}
+        \includegraphics[width=1\textwidth]{2.pdf}
+        \caption{Effect of different $\sigma_{r}^{2}$ on the prediction curve}
+        \end{figure}
+        \cleardoublepage
+       As we can see from the bottom Fig. 2, the regression curve fits quite decently the data, but the uncertainty (green area) increases as soon as we try to predict a big number of data points. It's also not surprising the smaller values of $\sigma$ (so a smaller green area) in the region in which the data points lie. Also here the regression curve tents pretty quickly to the mean value.
+       As the number of the data point points increases, the uncertainty region gets smaller with respect to the data range.
+        \begin{figure}
+        \includegraphics[width=0.8\textwidth]{3.pdf}
+        \includegraphics[width=0.8\textwidth]{4.pdf}
+        \caption{Prediction P=20 days for K=10 data samples}
+        
+        \end{figure}
+        \begin{figure}
+        \centering
+        \includegraphics[width=1\textwidth]{5.pdf}
+        \caption{K = 25}
+        \includegraphics[width=1\textwidth]{6.pdf}
+        \caption{K = N = 50}
+        \end{figure}
+        \cleardoublepage
+        \begin{figure}
+        \includegraphics[width=1\textwidth, height=8cm]{7.pdf}
+        \includegraphics[width=1\textwidth, height=8cm]{8.pdf}
+        \includegraphics[width=1\textwidth, height=8cm]{9.pdf}
+        \caption{Complete predictive distribution and MAP solution}
+        \end{figure}
+        \cleardoublepage
+        \begin{figure}
+        \includegraphics[width=1\textwidth, height=8cm]{10.pdf}
+        \includegraphics[width=1\textwidth, height=8cm]{11.pdf}
+        \includegraphics[width=1\textwidth, height=8cm]{12.pdf}
+        \end{figure}
+        \cleardoublepage
+        \begin{figure}
+        \includegraphics[width=1\textwidth, height=8cm]{13.pdf}
+        \end{figure}
+      \end{solution}
  \end{nexercise}
- 
+\cleardoublepage
  \begin{nexercise}{Logistic Regression}
 \end{nexercise}
 
