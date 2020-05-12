@@ -16,10 +16,10 @@
   \begin{solution} 1.
   
   \begin{align*}
-  p(t|\bm{x}, \bm{w}) = \prod_{n=1}^N \sqrt{\frac{\beta}{2\pi}}\exp{(-\beta \frac{(t-\bm{w}^{T} \bm{\phi}(x_n))^{2}}{2})}
+  p(t|\bm{x}, \bm{w}) = \prod_{n=1}^N \sqrt{\frac{\beta}{2\pi}}\exp{(-\beta \frac{(t_{n}-\bm{w}^{T} \bm{\phi}(x_n))^{2}}{2})}
   \end{align*}
   \begin{align*}
-      \log(p(\bm{t}|\bm{x}, \bm{w})) = \sum_{n=1}^N \frac{1}{2}(\ln{\beta}-\ln{2\pi}) + [-\frac{\beta}{2}(t-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}] = \frac{N}{2}(\ln\beta-\ln2\pi)-\beta\underbrace{\frac{1}{2}\sum_{n=1}^N(t-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}}_{E_D}= 
+      \log(p(\bm{t}|\bm{x}, \bm{w})) = \sum_{n=1}^N \frac{1}{2}(\ln{\beta}-\ln{2\pi}) + [-\frac{\beta}{2}(t_{n}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}] = \frac{N}{2}(\ln\beta-\ln2\pi)-\beta\underbrace{\frac{1}{2}\sum_{n=1}^N(t_{n}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}}_{E_D}= 
   \end{align*}
   \begin{align*} \frac{N}{2}(\ln\beta-\ln2\pi)-\beta E_{D}
   \end{align*}
@@ -41,11 +41,11 @@
   \end{align*}
   We assume that $p(\bm t)$ is not depending on $w$, so also its logarithm will be independent. \\ Let's compute the logarithm of the posterior simply as:
   \begin{align*}
-      \ln(p(\bm{t}|\bm{w}))+ \ln(p(\bm{w})) + cost = \underbrace{\frac{N}{2}\left(\ln\beta-\ln(2\pi)\right)}_\text{cost} - \frac{\beta}{2}\sum_{n=1}^{N}(t-\bm{w}^{T}\bm{\phi}(x_{n}))^{2} + \\ + \left[\underbrace{-\frac{M+1}{2}\ln(2\pi)-\frac{M+1}{2}\ln(\alpha)}_\text{cost}+\left(-\frac{\alpha}{2}\bm{w^{T}w}\right)\right] = \\
+      \ln(p(\bm{t}|\bm{w}))+ \ln(p(\bm{w})) + cost = \underbrace{\frac{N}{2}\left(\ln\beta-\ln(2\pi)\right)}_\text{cost} - \frac{\beta}{2}\sum_{n=1}^{N}(t_{n}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2} + \\ + \left[\underbrace{-\frac{M+1}{2}\ln(2\pi)-\frac{M+1}{2}\ln(\alpha)}_\text{cost}+\left(-\frac{\alpha}{2}\bm{w^{T}w}\right)\right] = \\
       \end{align*}
       concluding:
      \begin{align*}
-      \ln(p(\bm{w}|\bm{t})) = -\frac{\beta}{2}\sum_{n=1}^{N}(t-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}-\frac{\alpha}{2}\bm{w}^{T}\bm{w} + cost
+      \ln(p(\bm{w}|\bm{t})) = -\frac{\beta}{2}\sum_{n=1}^{N}(t_{n}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}-\frac{\alpha}{2}\bm{w}^{T}\bm{w} + cost
     \end{align*}
     where we grouped in $cost$ all the terms constant with respect to $w$.
     The maximization of this distribution w.r.t. $\bm{w}$ is equivalent to the minimization of the sum-of-squares approach with addition of a quadratic regularization term $\lambda = \frac{\alpha}{\beta}$. \\
