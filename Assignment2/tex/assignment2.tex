@@ -16,10 +16,10 @@
   \begin{solution} 1.
   
   \begin{align*}
-  p(t|\bm{x}, \bm{w}) = \prod_{n=1}^N \sqrt{\frac{\beta}{2\pi}}\exp{(-\beta \frac{( \bm{t}-\bm{w}^{T} \bm{\phi}(x_n))^{2}}{2})}
+  p(t|\bm{x}, \bm{w}) = \prod_{n=1}^N \sqrt{\frac{\beta}{2\pi}}\exp{(-\beta \frac{(t-\bm{w}^{T} \bm{\phi}(x_n))^{2}}{2})}
   \end{align*}
   \begin{align*}
-      \log(p(\bm{t}|\bm{x}, \bm{w})) = \sum_{n=1}^N \frac{1}{2}(\ln{\beta}-\ln{2\pi}) + [-\frac{\beta}{2}(\bm{t}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}] = \frac{N}{2}(\ln\beta-\ln2\pi)-\beta\underbrace{\frac{1}{2}\sum_{n=1}^N(\bm{t}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}}_{E_D}= 
+      \log(p(\bm{t}|\bm{x}, \bm{w})) = \sum_{n=1}^N \frac{1}{2}(\ln{\beta}-\ln{2\pi}) + [-\frac{\beta}{2}(t-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}] = \frac{N}{2}(\ln\beta-\ln2\pi)-\beta\underbrace{\frac{1}{2}\sum_{n=1}^N(t-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}}_{E_D}= 
   \end{align*}
   \begin{align*} \frac{N}{2}(\ln\beta-\ln2\pi)-\beta E_{D}
   \end{align*}
@@ -29,9 +29,9 @@
   \begin{solution} 2.
   \\ It's a multivariate Gaussian, and again we are going to compute the logarithm. So:
   \begin{align*}
-  \ln(p(\bm{w})) = \ln(\mathcal{N}(\bm {w} | \bm {0}, \alpha^{-1}I)) =  \ln\left(\frac{1}{(2\pi)^{\frac{M+1}{2}}|\alpha^{-1}I|}\exp\left((-\frac{1}{2}\bm{w}^{T}(\alpha^{-1}I)\bm{w})\right) \right)= \\ -\frac{M+1}{2}\ln(2\pi)-\frac{1}{2}\ln(|\alpha^{-1}I|)-\left(\frac{1}{2}\bm{w}^{T}(\alpha^{-1}I)\bm{w}\right) = \\ -\frac{M+1}{2}\ln(2\pi)+\frac{M+1}{2}\ln(\alpha)-\frac{1}{2}\sum_{i=1}^M+1 \frac{w_i}{\alpha}
+  \ln(p(\bm{w})) = \ln(\mathcal{N}(\bm {w} | \bm {0}, \alpha^{-1}I)) =  \ln\left(\frac{1}{(2\pi)^{\frac{M+1}{2}}|\alpha^{-1}I|}\exp\left((-\frac{1}{2}\bm{w}^{T}(\alpha^{-1}I)\bm{w})\right) \right)= \\ -\frac{M+1}{2}\ln(2\pi)-\frac{1}{2}\ln(|\alpha^{-1}I|)-\left(\frac{1}{2}\bm{w}^{T}(\alpha^{-1}I)\bm{w}\right) = \\ -\frac{M+1}{2}\ln(2\pi)+\frac{M+1}{2}\ln(\alpha)-\frac{\alpha}{2}\bm{w^{T}w}
   \end{align*}
-  In this setting we notice that only the third term is dependent on $w$, while the first two terms as constants. We'll use this consideration for the next exercise.
+  In this setting we notice that only the third term is dependent on $w$, while the first two terms are constant. We'll use this consideration for the next exercise.
     \end{solution}\\
     \begin{solution} 3.
   \par 
@@ -41,21 +41,21 @@
   \end{align*}
   We assume that $p(\bm t)$ is not depending on $w$, so also its logarithm will be independent. \\ Let's compute the logarithm of the posterior simply as:
   \begin{align*}
-      \ln(p(\bm{t}|\bm{w}))+ \ln(p(\bm{w})) + cost = \underbrace{\frac{N}{2}\left(\ln\beta-\ln(2\pi)\right)}_\text{cost} - \frac{\beta}{2}\sum_{n=1}^{N}(\bm{t}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2} + \\ + \left[\underbrace{-\frac{D}{2}\ln(2\pi)-\frac{D}{2}\ln(\alpha)}_\text{cost}+\left(-\frac{1}{2}\bm{w}^{T}(\alpha^{-1}I)^{-1}\bm{w}\right)\right] = \\
+      \ln(p(\bm{t}|\bm{w}))+ \ln(p(\bm{w})) + cost = \underbrace{\frac{N}{2}\left(\ln\beta-\ln(2\pi)\right)}_\text{cost} - \frac{\beta}{2}\sum_{n=1}^{N}(t-\bm{w}^{T}\bm{\phi}(x_{n}))^{2} + \\ + \left[\underbrace{-\frac{M+1}{2}\ln(2\pi)-\frac{M+1}{2}\ln(\alpha)}_\text{cost}+\left(-\frac{\alpha}{2}\bm{w^{T}w}\right)\right] = \\
       \end{align*}
       concluding:
      \begin{align*}
-      \ln(p(\bm{w}|\bm{t})) = -\frac{\beta}{2}\sum_{n=1}^{N}(\bm{t}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}-\frac{\alpha}{2}\bm{w}^{T}\bm{w} + cost
+      \ln(p(\bm{w}|\bm{t})) = -\frac{\beta}{2}\sum_{n=1}^{N}(t-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}-\frac{\alpha}{2}\bm{w}^{T}\bm{w} + cost
     \end{align*}
-    where we grouped in $cost$ all the terms constant with respect to $w$. The alpha becomes a scalar multiplying the vector product.
+    where we grouped in $cost$ all the terms constant with respect to $w$.
     The maximization of this distribution w.r.t. $\bm{w}$ is equivalent to the minimization of the sum-of-squares approach with addition of a quadratic regularization term $\lambda = \frac{\alpha}{\beta}$. \\
       \end{solution}
       \par
       \begin{solution} 4.\\
-      Let's now maximise the log-posterior w.r.t. $w$
-      We can express the vectors $\phi(x_{i})$ as rows of the design matrix $\Phi$
+      Let's now maximise the log-posterior w.r.t. $w$.
+      We will express the elements t and $\phi(x_{i})$ as part of $\bm{t}$ and $\bm{\Phi}$
       \begin{align*}
-          \frac{\partial}{\partial w_{i}}\left[\frac{\beta}{2}\sum_{n=1}^{N}(\bm{t}-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}-\frac{\alpha}{2}\bm{w}^{T}\bm{w}+cost \right] = \frac{\beta}{2}(2\Phi_{i}^{T}\Phi \bm{w} - 2\Phi_{i}^{T}\bm{t}) + \frac{\alpha}{2}2\bm{w} = \\ = \left(\beta\Phi^{T}\Phi+\alpha I\right)\bm{w}-\beta\Phi_{i}^{T}\bm{t} \stackrel{!}{=} 0 \\
+          \frac{\partial}{\partial w_{i}}\left[\frac{\beta}{2}\sum_{n=1}^{N}(t-\bm{w}^{T}\bm{\phi}(x_{n}))^{2}-\frac{\alpha}{2}\bm{w}^{T}\bm{w}+cost \right] = \frac{\beta}{2}(2\Phi_{i}^{T}\Phi \bm{w} - 2\Phi_{i}^{T}\bm{t}) + \frac{\alpha}{2}2\bm{w} = \\ = \left(\beta\Phi^{T}\Phi+\alpha I\right)\bm{w}-\beta\Phi_{i}^{T}\bm{t} \stackrel{!}{=} 0 \\
       \end{align*}
       \begin{align*}
           \Rightarrow \bm{w}_{map} = (\Phi^{T}\Phi + \frac{\alpha}{\beta}I)^{-1}\Phi \bm{t} \\
@@ -64,18 +64,27 @@
       \end{solution}
       \par
       \begin{solution} 5, 6, 7, 8.\\
-            Here $K = 33$ was chosen.
-              We can see here that as we increase sigma the curve gets smoother while interpolating between the data points. On the other hand, if we decrease sigma (e.g. $\sigma_{r}^{2} = 0.1$) the curve present peaks, sometimes showing a discontinuity on the first derivative of the curve. This is because our function learns very particular “behaviour” from the data: each data points has a narrow effect on the prediction of the next value.
+            In Fig. 1 $K = 33$ was chosen,
+            $\sigma_{r}^{2} = 6$, $\alpha = 0.0005$, $\beta = 0.0009$.
+              We can see here that as we increase $\sigma_{r}^{2}$ the curve gets slightly smoother while interpolating between the data points. On the other hand, given the same parameters, if we decrease $\sigma_{r}^{2}$ (e.g. $\sigma_{r}^{2} = 0.1$) the curve present peaks, since we're assigning a high likelihood to each data sample. We're then facing overfitting, and our function learns very particular behaviours from our data and try to fits it in a over complicated model.
+              In this case, each data sample influences very slightly its neighbours.
             We can also notice how abruptly our prediction for $x > K$ flattens on the mean value.
         \begin{figure}
         \centering
         \includegraphics[width=1\textwidth]{1.pdf}
+        \caption{$\sigma_{r}^{2} = 6$}
         \includegraphics[width=1\textwidth]{2.pdf}
-        \caption{Effect of different $\sigma_{r}^{2}$ on the prediction curve}
+        \caption{$\sigma_{r}^{2} = 0.1$}
         \end{figure}
         \cleardoublepage
-       As we can see from the bottom Fig. 2, the regression curve fits quite decently the data, but the uncertainty (green area) increases as soon as we try to predict a big number of data points. It's also not surprising the smaller values of $\sigma$ (so a smaller green area) in the region in which the data points lie. Also here the regression curve tents pretty quickly to the mean value.
-       As the number of the data point points increases, the uncertainty region gets smaller with respect to the data range.
+       As we can see from Fig. 3, the regression curve for K=10 fits quite decently the data, but the uncertainty increases as soon as we try to predict a big of data points compared to the data we have. It's also not surprising that we have smaller values of $\sigma$ in the region in which the data points lie.
+       As the number of the data point points increases (Fig. 4, 5), the green $+/-2\sigma$ region gets smaller with respect to the data range.\\
+       In Fig. 6 we highlighted the MAP weights as well.
+       In Fig. 7, 8 setting $\alpha = 0$ we obtained an unregularized least-squares plot, since $\lambda = \frac{\alpha}{\beta}$.
+       In Fig. 9, 10, we set different (extreme) ratios for $\frac{\alpha}{\beta}$, with $0.1 <\alpha, \beta < 10$
+       In this last two Figures we notice how different values for of $\frac{\alpha}{\beta}$ encourages the coefficients to decay.
+       Finally, in Figure 11 we see how decreasing $\beta$ (precision parameter) increases $\sigma$.
+       
         \begin{figure}
         \includegraphics[width=0.8\textwidth]{3.pdf}
         \includegraphics[width=0.8\textwidth]{4.pdf}
@@ -99,12 +108,23 @@
         \cleardoublepage
         \begin{figure}
         \includegraphics[width=1\textwidth, height=8cm]{10.pdf}
+        \caption{$\alpha = 0$, $\sigma_{r}^{2}=5$}
         \includegraphics[width=1\textwidth, height=8cm]{11.pdf}
-        \includegraphics[width=1\textwidth, height=8cm]{12.pdf}
+        \caption{$\alpha = 0$, $\sigma_{r}^{2}=10$}
         \end{figure}
         \cleardoublepage
         \begin{figure}
+        \includegraphics[width=1\textwidth, height=8cm]{12.pdf}
+        \caption{$\frac{\alpha}{\beta}=100$, $0.1 <\alpha, \beta < 10$ }
         \includegraphics[width=1\textwidth, height=8cm]{13.pdf}
+        \caption{$\frac{\alpha}{\beta}=0.01$, $0.1 <\alpha, \beta < 10$ }
+        \end{figure}
+        \cleardoublepage
+        \begin{figure}
+        \includegraphics[width=1\textwidth, height=7cm]{15.pdf}
+        \includegraphics[width=1\textwidth, height=7cm]{16.pdf}
+        \includegraphics[width=1\textwidth, height=7cm]{14.pdf}
+        \caption{$\frac{\alpha}{\beta}=1$ for decreasing values of $\alpha$ or $\beta$}
         \end{figure}
       \end{solution}
  \end{nexercise}
