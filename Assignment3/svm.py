@@ -9,6 +9,8 @@ Created on Wed Jun 10 19:14:20 2020
 import numpy as np
 import matplotlib.pyplot as plt
 
+sigma=0.1
+
 def prox_sub_grad(w,x,alpha,l):
     _phi=phi(x)
     gamma=np.ones((len(x[0])))
@@ -25,7 +27,42 @@ def prox_sub_grad(w,x,alpha,l):
 
 def phi(x):
     _phi=np.concatenate((np.ones((len(x),1)),x[:,0:2]),axis=1)
+    _phi=np.concatenate((np.ones((len(x),1)),x[:,0:2]),axis=1)
     return _phi
+
+def kernel_G(x, sigma):
+    n=len(x)
+    x=np.repeat(x[:,:,np.newaxis],n,axis=2)
+    x2=np.swapaxes(x,0,2)
+    k=x-x2
+    k=k**2
+    k=np.sum(k,axis=1)
+    k=k/-(2*sigma)
+    k=np.exp(k)
+    return k
+
+def gradient(a, x, t):
+    k=kernel_G(x,sigma)
+    g=1-t * (k @ (a*t))
+    return g
+
+def FISTA(x, t):
+    j1=1
+    a1=a0=np.zeros((len(x)))
+    alpha=0.001
+    for i in range(100):
+        j0=j1
+        j1=(1+np.sqrt(1+4*(j0**2)))/2
+        a_tilde=a1+((j0-1)/j1)*(a1-a0)
+        a_tilde=np.reshape(a_tilde,(len(x)))
+        print('a_tilde is ',np.shape(a_tilde))
+        a0=a1
+        print('grandient is ',np.shape(gradient(np.reshape(a_tilde,(len(x))),x,t)))
+        compare = a_tilde+alpha*gradient(a_tilde,x,t)
+        print('compare is ', np.shape(compare))
+        a1=np.max(np.concatenate((np.zeros((len(x),1)),compare[:,np.newaxis]),axis=1),axis=1)
+        print('a1 is ', np.shape(a1))
+    return a1
 
 mu1=[6.5,2]
 sigma1=[[0.8,0],[0,0.7]]
@@ -43,8 +80,8 @@ simple=np.concatenate((simple1,simple2))
 
 plt.scatter(simple1[:,0],simple1[:,1])
 plt.scatter(simple2[:,0],simple2[:,1],color='red')
-plt.savefig('tex/images/simple.pdf')
-plt.show()
+#plt.savefig('tex/images/simple.pdf')
+#plt.show()
 
 sd=0.01
 
@@ -66,8 +103,8 @@ moon=np.concatenate((moon1,moon2))
 
 plt.scatter(moon1[:,0],moon1[:,1])
 plt.scatter(moon2[:,0],moon2[:,1],color='red')
-plt.savefig('tex/images/moon.pdf')
-plt.show()
+#plt.savefig('tex/images/moon.pdf')
+#plt.show()
 
 w=np.ones((3))
 w=prox_sub_grad(w,simple,0.01,0.5)
@@ -91,8 +128,8 @@ plt.scatter(simple2[closest2,0], simple2[closest2,1],facecolors='none', edgecolo
 plt.plot(xs,ys,c='black',linewidth=2)
 plt.plot(xs+left_offset,ys,c='black',linewidth=1)
 plt.plot(xs+right_offset,ys,c='black',linewidth=1)
-plt.savefig('tex/images/simple-line.pdf')
-plt.show()
+#plt.savefig('tex/images/simple-line.pdf')
+#plt.show()
 
 ###############################################################################
 
@@ -118,5 +155,9 @@ plt.scatter(moon2[closest2,0], moon2[closest2,1],facecolors='none', edgecolors='
 plt.plot(xs,ys,c='black',linewidth=2)
 plt.plot(xs+left_offset,ys,c='black',linewidth=1)
 plt.plot(xs+right_offset,ys,c='black',linewidth=1)
-plt.savefig('tex/images/moon-line.pdf')
-plt.show()
+#plt.savefig('tex/images/moon-line.pdf')
+#plt.show()
+
+
+print(FISTA(simple[:, :2], simple[:, 2]))
+#print(np.shape(np.reshape(np.zeros((200,1)),(200))))
