@@ -2,20 +2,19 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Jun 10 19:14:20 2020
-
 @author: daniel
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-sigma=0.1
+sigma=0.2
 
 def prox_sub_grad(w,x,alpha,l):
     _phi=phi(x)
     gamma=np.ones((len(x[0])))
     gamma[0]=1e-6
-    for i in range(10000):
+    for i in range(1000):
         t=np.reshape(x[:,2],(len(x),1))
         g=-np.repeat(t,3,axis=1)*_phi
         t=np.reshape(t,(len(x)))
@@ -41,8 +40,19 @@ def kernel_G(x, sigma):
     k=np.exp(k)
     return k
 
+def kernel_G2(x1,x2,sigma):
+    k=x1-x2
+    k=k**2
+    k=np.sum(k,axis=-1)
+    k=k/-(2*sigma)
+    k=np.exp(k)
+    return k
+
 def gradient(a, x, t):
-    k=kernel_G(x,sigma)
+    x2=np.repeat(x[:,np.newaxis,:],len(x),axis=1)
+    x2=np.swapaxes(x2,0,1)
+    x=np.repeat(x[:,np.newaxis,:],len(x),axis=1)
+    k=kernel_G2(x,x2,sigma)
     g=1-t * (k @ (a*t))
     return g
 
@@ -50,19 +60,25 @@ def FISTA(x, t):
     j1=1
     a1=a0=np.zeros((len(x)))
     alpha=0.001
-    for i in range(100):
+    for i in range(1000):
         j0=j1
         j1=(1+np.sqrt(1+4*(j0**2)))/2
         a_tilde=a1+((j0-1)/j1)*(a1-a0)
         a_tilde=np.reshape(a_tilde,(len(x)))
-        print('a_tilde is ',np.shape(a_tilde))
         a0=a1
-        print('grandient is ',np.shape(gradient(np.reshape(a_tilde,(len(x))),x,t)))
         compare = a_tilde+alpha*gradient(a_tilde,x,t)
-        print('compare is ', np.shape(compare))
         a1=np.max(np.concatenate((np.zeros((len(x),1)),compare[:,np.newaxis]),axis=1),axis=1)
-        print('a1 is ', np.shape(a1))
     return a1
+
+def y(x,X,a,t,sigma):
+    x=np.transpose(x)
+    x=np.repeat(x[:,:,np.newaxis,:],len(X),axis=2)
+    X=np.repeat(X[np.newaxis,:,:],len(x),axis=0)
+    X=np.repeat(X[:,np.newaxis,:,:],len(x[0]),axis=1)
+    k=kernel_G2(x,X,sigma)
+    _y=a*t*k
+    _y=np.sum(_y,axis=-1)
+    return np.transpose(_y)
 
 mu1=[6.5,2]
 sigma1=[[0.8,0],[0,0.7]]
@@ -81,7 +97,7 @@ simple=np.concatenate((simple1,simple2))
 plt.scatter(simple1[:,0],simple1[:,1])
 plt.scatter(simple2[:,0],simple2[:,1],color='red')
 #plt.savefig('tex/images/simple.pdf')
-#plt.show()
+plt.show()
 
 sd=0.01
 
@@ -104,7 +120,7 @@ moon=np.concatenate((moon1,moon2))
 plt.scatter(moon1[:,0],moon1[:,1])
 plt.scatter(moon2[:,0],moon2[:,1],color='red')
 #plt.savefig('tex/images/moon.pdf')
-#plt.show()
+plt.show()
 
 w=np.ones((3))
 w=prox_sub_grad(w,simple,0.01,0.5)
@@ -129,7 +145,7 @@ plt.plot(xs,ys,c='black',linewidth=2)
 plt.plot(xs+left_offset,ys,c='black',linewidth=1)
 plt.plot(xs+right_offset,ys,c='black',linewidth=1)
 #plt.savefig('tex/images/simple-line.pdf')
-#plt.show()
+plt.show()
 
 ###############################################################################
 
@@ -156,8 +172,22 @@ plt.plot(xs,ys,c='black',linewidth=2)
 plt.plot(xs+left_offset,ys,c='black',linewidth=1)
 plt.plot(xs+right_offset,ys,c='black',linewidth=1)
 #plt.savefig('tex/images/moon-line.pdf')
-#plt.show()
+plt.show()
 
 
 print(FISTA(simple[:, :2], simple[:, 2]))
 #print(np.shape(np.reshape(np.zeros((200,1)),(200))))
+
+a=FISTA(moon[:,:2],moon[:,2])
+
+x=np.linspace(-1,2,100)
+_y=np.linspace(0,1,100)
+xy=np.meshgrid(x,_y)
+X=moon[:,:2]
+t=moon[:,2]
+z=y(xy,X,a,t,sigma)
+
+
+plt.scatter(moon1[:,0],moon1[:,1],marker='x')
+plt.scatter(moon2[:,0],moon2[:,1],color='red',marker='x')
+plt.contour(xy[0],xy[1],z,levels=[-1,0,1])
