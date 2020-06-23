@@ -1,34 +1,46 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Created on Tue Jun 23 18:52:02 2020
+
+@author: daniel
+"""
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
 Created on Wed Jun 10 19:14:20 2020
 @author: daniel, lorenzo
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.optimize import approx_fprime
 
 sigma=0.5
-np.random.seed(3)
+epsilon=0.1
+np.random.seed(10)
 
-D_array = np.zeros(1000)
 
-def prox_sub_grad(w,x,alpha,l):
+def prox_sub_grad(w,x,alpha,l,eps=1e-2):
     _phi=phi(x)
     gamma=np.ones((len(x[0])))
     gamma[0]=1e-6
-    for i in range(1000):
+    w_old=w+1
+    i=0
+    while np.linalg.norm(w-w_old)>eps or i <10000:
         t=np.reshape(x[:,2],(len(x),1))
         g=-np.repeat(t,3,axis=1)*_phi
         t=np.reshape(t,(len(x)))
         g[t*np.matmul(_phi,w)>=1]=0
         g=np.mean(g,axis=0)
+        w_old=w
         w=w-alpha*g
         w=w/(1+alpha*l*gamma)
+        i+=1
     return w
 
 def phi(x):
-    _phi=np.concatenate((np.ones((len(x),1)),x[:,0:2]),axis=1)
     _phi=np.concatenate((np.ones((len(x),1)),x[:,0:2]),axis=1)
     return _phi
 
@@ -59,21 +71,29 @@ def gradient(a, x, t):
     g=1-t * (k @ (a*t))
     return g
 
-def FISTA(x, t):
+def FISTA(x, t,eps=1e-2):
     j1=1
     a1=a0=np.zeros((len(x)))
+    a_old=a1+1
     alpha=0.001
-    for i in range(1000):
+    D_array=[]
+    i=0
+    while np.abs(D(a1,t,phi(x),sigma)-D(a_old,t,phi(x),sigma))>eps or i<1000:
         j0=j1
         j1=(1+np.sqrt(1+4*(j0**2)))/2
         a_tilde=a1+((j0-1)/j1)*(a1-a0)
         a_tilde=np.reshape(a_tilde,(len(x)))
         a0=a1
         compare = a_tilde+alpha*gradient(a_tilde,x,t)
+        #print(gradient(a_tilde,x,t)/approx_fprime(a_tilde, D, 1e-2, t,x,sigma))
+        #compare = a_tilde+alpha*approx_fprime(a_tilde, D, 1e-6, t,phi(x),sigma)
+        a_old=a1
         a1=np.max(np.concatenate((np.zeros((len(x),1)),compare[:,np.newaxis]),axis=1),axis=1)
-        # D computed for simple dataset
-        D_array[i] = D(a1,t,phi(simple),sigma)
-    return a1
+
+        D_array.append(D(a1,t,phi(x),sigma))
+        i+=1
+        print(np.abs(D(a1,t,phi(x),sigma)-D(a_old,t,phi(x),sigma)))
+    return a1,D_array
 
 def y(x,X,a,t,sigma):
     x=np.transpose(x)
@@ -81,7 +101,8 @@ def y(x,X,a,t,sigma):
     X=np.repeat(X[np.newaxis,:,:],len(x),axis=0)
     X=np.repeat(X[:,np.newaxis,:,:],len(x[0]),axis=1)
     k=kernel_G2(x,X,sigma)
-    _y=a*t*k
+    _y=np.multiply(a,t)
+    _y=np.multiply(_y,k)
     _y=np.sum(_y,axis=-1)
     return np.transpose(_y)
 
@@ -99,6 +120,9 @@ def D(a, t, phi, sigma):
     part4 = np.sum(part4)
     return -0.5*part4+part
 
+def f(w,x,y):
+    return w[0]+w[1]*x+w[2]*y
+
 
 mu1=[6.5,2]
 sigma1=[[0.8,0],[0,0.7]]
@@ -114,9 +138,9 @@ simple2=np.concatenate((simple2,-np.ones((100,1))),axis=1)
 
 simple=np.concatenate((simple1,simple2))
 
-plt.scatter(simple1[:,0],simple1[:,1])
-plt.scatter(simple2[:,0],simple2[:,1],color='red')
-#plt.savefig('tex/images/simple.pdf')
+plt.scatter(simple1[:,0],simple1[:,1],marker='x')
+plt.scatter(simple2[:,0],simple2[:,1],color='red',marker='x')
+plt.savefig('tex/images/simple.pdf')
 plt.show()
 
 sd=0.01
@@ -137,68 +161,56 @@ moon2=np.concatenate((x2,y2,-np.ones((100,1))),axis=1)
 
 moon=np.concatenate((moon1,moon2))
 
-plt.scatter(moon1[:,0],moon1[:,1])
-plt.scatter(moon2[:,0],moon2[:,1],color='red')
-#plt.savefig('tex/images/moon.pdf')
+plt.scatter(moon1[:,0],moon1[:,1],marker='x')
+plt.scatter(moon2[:,0],moon2[:,1],color='red',marker='x')
+plt.savefig('tex/images/moon.pdf')
 plt.show()
 
 w=np.ones((3))
-w=prox_sub_grad(w,simple,0.01,0.5)
-w/=w[1]
-ys=[np.min(simple[:,1]),np.max(simple[:,1])]
-xs=-w[0]-np.multiply(w[2],ys)
+w=prox_sub_grad(w,simple,3,0.0001)
 
-left=simple[np.matmul(phi(simple),w)<=0]
-right=simple[np.matmul(phi(simple),w)>=0]
+x=np.linspace(np.min(simple[:,0]),np.max(simple[:,0]),50)
+_y=np.linspace(np.min(simple[:,1]),np.max(simple[:,1]),50)
 
-closest1=np.argmin(np.matmul(phi(simple1),w))
-closest2=np.argmax(np.matmul(phi(simple2),w))
+xx,yy=np.meshgrid(x,_y)
+z=f(w,xx,yy)
 
-left_offset=simple1[closest1,0]-(-w[0]-np.multiply(w[2],simple1[closest1,1]))
-right_offset=simple2[closest2,0]-(-w[0]-np.multiply(w[2],simple2[closest2,1]))
+support_vectors=simple[np.abs(f(w,simple[:,0],simple[:,1])-1)<epsilon]
+support_vectors=np.concatenate((support_vectors,simple[np.abs(f(w,simple[:,0],simple[:,1])+1)<epsilon]))
 
-plt.scatter(simple1[:,0],simple1[:,1])
-plt.scatter(simple2[:,0],simple2[:,1],color='red')
-plt.scatter(simple1[closest1,0], simple1[closest1,1],facecolors='none', edgecolors='black',s=150)
-plt.scatter(simple2[closest2,0], simple2[closest2,1],facecolors='none', edgecolors='black',s=150)
-plt.plot(xs,ys,c='black',linewidth=2)
-plt.plot(xs+left_offset,ys,c='black',linewidth=1)
-plt.plot(xs+right_offset,ys,c='black',linewidth=1)
-#plt.savefig('tex/images/simple-line.pdf')
+plt.scatter(simple1[:,0],simple1[:,1],marker='x')
+plt.scatter(simple2[:,0],simple2[:,1],color='red',marker='x')
+plt.scatter(support_vectors[:,0], support_vectors[:,1],facecolors='none', edgecolors='black',s=150)
+plt.contour(xx,yy,z,levels=[-1,0,1])
+
+plt.savefig('tex/images/simple-line.pdf')
 plt.show()
 
 ###############################################################################
 
 w=np.ones((3))
-w=prox_sub_grad(w,moon,0.01,1)
-w/=w[1]
-ys=[np.min(moon[:,1]),np.max(moon[:,1])]
-xs=-w[0]-np.multiply(w[2],ys)
+w=prox_sub_grad(w,moon,3,0.0001,1)
 
-left=moon[np.matmul(phi(moon),w)<=0]
-right=moon[np.matmul(phi(moon),w)>=0]
+x=np.linspace(np.min(moon[:,0]),np.max(moon[:,0]),50)
+_y=np.linspace(np.min(moon[:,1]),np.max(moon[:,1]),50)
 
-closest1=np.argmax(np.matmul(phi(moon1),w))
-closest2=np.argmin(np.matmul(phi(moon2),w))
+xx,yy=np.meshgrid(x,_y)
+z=f(w,xx,yy)
 
-left_offset=moon1[closest1,0]-(-w[0]-np.multiply(w[2],moon1[closest1,1]))
-right_offset=moon2[closest2,0]-(-w[0]-np.multiply(w[2],moon2[closest2,1]))
+support_vectors=moon[np.abs(f(w,moon[:,0],moon[:,1])-1)<epsilon]
+support_vectors=np.concatenate((support_vectors,moon[np.abs(f(w,moon[:,0],moon[:,1])+1)<epsilon]))
 
 plt.scatter(moon1[:,0],moon1[:,1],marker='x')
 plt.scatter(moon2[:,0],moon2[:,1],color='red',marker='x')
-plt.scatter(moon1[closest1,0], moon1[closest1,1],facecolors='none', edgecolors='black',s=150)
-plt.scatter(moon2[closest2,0], moon2[closest2,1],facecolors='none', edgecolors='black',s=150)
-plt.plot(xs,ys,c='black',linewidth=2)
-plt.plot(xs+left_offset,ys,c='black',linewidth=1)
-plt.plot(xs+right_offset,ys,c='black',linewidth=1)
-#plt.savefig('tex/images/moon-line.pdf')
+plt.scatter(support_vectors[:,0], support_vectors[:,1],facecolors='none', edgecolors='black',s=150)
+plt.contour(xx,yy,z,levels=[-1,0,1])
+plt.savefig('tex/images/moon-line.pdf')
 plt.show()
 
+###############################################################################
 
-print(FISTA(simple[:, :2], simple[:, 2]))
-#print(np.shape(np.reshape(np.zeros((200,1)),(200))))
+a,D_array=FISTA(moon[:,:2],moon[:,2],100)
 
-a=FISTA(moon[:,:2],moon[:,2])
 
 x=np.linspace(-1,2,100)
 _y=np.linspace(0,1,100)
@@ -207,9 +219,15 @@ X=moon[:,:2]
 t=moon[:,2]
 z=y(xy,X,a,t,sigma)
 
+X2=np.swapaxes([X],0,2)
+X2=np.swapaxes(X2,1,2)
+
+support_vectors=moon[np.abs(np.reshape(y(X2,X,a,t,sigma),(200))-1)<epsilon]
+support_vectors=np.concatenate((support_vectors,moon[np.abs(np.reshape(y(X2,X,a,t,sigma),(200))+1)<epsilon]))
 
 plt.scatter(moon1[:,0],moon1[:,1],marker='x')
 plt.scatter(moon2[:,0],moon2[:,1],color='red',marker='x')
+plt.scatter(support_vectors[:,0], support_vectors[:,1],facecolors='none', edgecolors='black',s=150)
 plt.contour(xy[0],xy[1],z,levels=[-1,0,1])
 plt.title('Decision boundary for sigma = %f' % sigma)
 plt.savefig('tex/images/decision_boundary_2.pdf')
@@ -219,5 +237,5 @@ plt.show()
 plt.plot(D_array)
 plt.title('D for Simple dataset, sigma = %f' % sigma)
 plt.xlabel('Iterations')
-#plt.savefig('tex/images/Simple_D_iterations.pdf')
-#plt.show()
+plt.savefig('tex/images/Simple_D_iterations.pdf')
+plt.show()
