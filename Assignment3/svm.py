@@ -92,7 +92,7 @@ def FISTA(x, t,eps=1e-2):
 
         D_array.append(D(a1,t,phi(x),sigma))
         i+=1
-        print(np.abs(D(a1,t,phi(x),sigma)-D(a_old,t,phi(x),sigma)))
+        #print(np.abs(D(a1,t,phi(x),sigma)-D(a_old,t,phi(x),sigma)))
     return a1,D_array
 
 def y(x,X,a,t,sigma):
