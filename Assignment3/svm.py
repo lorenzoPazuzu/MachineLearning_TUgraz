@@ -2,13 +2,16 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Jun 10 19:14:20 2020
-@author: daniel
+@author: daniel, lorenzo
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-sigma=0.2
+sigma=0.5
+np.random.seed(3)
+
+D_array = np.zeros(1000)
 
 def prox_sub_grad(w,x,alpha,l):
     _phi=phi(x)
@@ -68,6 +71,8 @@ def FISTA(x, t):
         a0=a1
         compare = a_tilde+alpha*gradient(a_tilde,x,t)
         a1=np.max(np.concatenate((np.zeros((len(x),1)),compare[:,np.newaxis]),axis=1),axis=1)
+        # D computed for simple dataset
+        D_array[i] = D(a1,t,phi(simple),sigma)
     return a1
 
 def y(x,X,a,t,sigma):
@@ -79,6 +84,21 @@ def y(x,X,a,t,sigma):
     _y=a*t*k
     _y=np.sum(_y,axis=-1)
     return np.transpose(_y)
+
+def D(a, t, phi, sigma):
+    part = np.sum(a)
+    t = np.asmatrix(t)
+    a = np.asmatrix(a)
+    part2 = np.dot(t.T, t)
+    part3 = np.dot(a.T, t)
+    part2 = part2.reshape(len(phi)**2, 1)
+    part3 = part3.reshape(len(phi)**2, 1)
+    part4 = np.multiply(part2, part3)
+    k = kernel_G(phi, sigma).reshape(len(phi)**2, 1)
+    part4 = np.multiply(part4, k)
+    part4 = np.sum(part4)
+    return -0.5*part4+part
+
 
 mu1=[6.5,2]
 sigma1=[[0.8,0],[0,0.7]]
@@ -191,3 +211,13 @@ z=y(xy,X,a,t,sigma)
 plt.scatter(moon1[:,0],moon1[:,1],marker='x')
 plt.scatter(moon2[:,0],moon2[:,1],color='red',marker='x')
 plt.contour(xy[0],xy[1],z,levels=[-1,0,1])
+plt.title('Decision boundary for sigma = %f' % sigma)
+plt.savefig('tex/images/decision_boundary_2.pdf')
+plt.show()
+
+### D on iterations
+plt.plot(D_array)
+plt.title('D for Simple dataset, sigma = %f' % sigma)
+plt.xlabel('Iterations')
+#plt.savefig('tex/images/Simple_D_iterations.pdf')
+#plt.show()
